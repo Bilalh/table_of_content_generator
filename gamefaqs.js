@@ -10,7 +10,7 @@ function prettyifyGamefaqs () {
 
 
 	// must have a lest 2 chars
-	var tocIdsRegex = /\[\w[\w_-]{1,}?\]/g
+	var tocIdsRegex = /^[ \t]*\[\w[\w_-]{1,}?\]|[ \t]*\[\w[\w_-]{1,}?\][ \t]*$/gm
 	var tocIds      = faq.match(tocIdsRegex)
 	
 	 if (tocIds.length <= 0){
@@ -18,13 +18,20 @@ function prettyifyGamefaqs () {
 		return;
 	}
 	
+	// console.log(tocIds);
+	// return;
+	
+	tocIds = tocIds.map(function(ele){
+		return ele.trim();
+	});
+	
+	
 	if (tocIds[0] == tocIds[1]){
 		console.log("Removed " + tocIds.splice(0,2) );
 	}
 	
 	tocIdsUniq = getElementsThatOccur(2,tocIds);
 	
-	console.log(tocIds);
 	console.log(tocIdsUniq);
 	console.log("length: " + tocIdsUniq.length);
 		
@@ -34,11 +41,13 @@ function prettyifyGamefaqs () {
 	var newStart = getNewStartingPoint(faq,start_of_faq);
 	faq = faq.slice(newStart)
 
+	tocIdsUniq = tocIdsUniq.filter(function(ele){
+		return faq.indexOf(ele) == faq.lastIndexOf(ele);
+	});
+
 
 	console.log("\n\n\n")
 	section_indexes = tocIdsUniq.slice(1).map(function(ele){
-	// var section_indexes = tocIdsUniq.slice(10,20).map(function(ele){
-		console.log(ele)
 		var start_of_section = faq.indexOf(ele);
 		var new_start = getNewStartingPoint(faq,start_of_section)
 		return new_start;
@@ -58,17 +67,48 @@ function prettyifyGamefaqs () {
 	};
 	
 	
-	sections.forEach(function(ele){
+	
+	sections.forEach(function(ele,index){
 		var pre = document.createElement('pre');
 		pre.appendChild(document.createTextNode(ele));
 		
 		var heading = document.createElement('h1');
-		heading.appendChild(document.createTextNode("Section"));
+		heading.appendChild(document.createTextNode( getSectionName(ele,tocIdsUniq[index]) ));
 		
 		$('div#content').append(heading);
 		$('div#content').append(pre);
 	});
+}
+
+function getSectionName(text,shortName){
+	var titlePart = text.slice(0,text.indexOf(shortName) )
+	titlePart = titlePart.trim();
 	
+	var index = 0;
+	while (text[index] == '=' || text[index] == '*' || text[index] == '#' || text[index] == '-' ){
+		index++;
+	}
+	titleRes = titlePart.slice(index)
+	
+	// console.log(shortName)
+	// console.log(titleRes);
+	if (titleRes.length < 3 ){
+		return shortName;
+	}
+	
+	if (titleRes.toUpperCase() == titleRes){
+		return(toTitleCase(titleRes));
+	}
+
+	
+	return titleRes;
+}
+
+
+function toTitleCase(str){
+    return str.replace(/\w\S*/g, function(txt){
+		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+	});
 }
 
 function getNewStartingPoint(faq,start){	
@@ -81,14 +121,12 @@ function getNewStartingPoint(faq,start){
 	
 	// Go before decoration e.g  ===  above the line
 	var c = faq[start];
-	console.log("Start c: "+  c)
 	if (c == '=' || c == '*' || c == '#' || c == '-' ){
 		var index = start;
 		var d = c;
 		while ( (d = faq[index]) != '\n'){
 			index--;
 			if ( !(d == c || d == ' '  || d == '\t' || d == '\n') ){
-				console.log("##" + d + "##");
 				break;
 			}
 		}
