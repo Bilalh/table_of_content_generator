@@ -1,14 +1,13 @@
-$(document).ready(function() {
-	prettyifyGamefaqs();
-	$('#toc').toc();
-});
+function parseGameFaqs(o){
+	var text = o.query.results.pre; 
+	$(document).ready(function() {
+		prettyifyGamefaqs(text);
+		$('#toc').toc();
+	});
+}
 
-function prettyifyGamefaqs () {
-	console.log("testing");
-	var faq = $('pre').text();
+function prettyifyGamefaqs (faq) {
 	$('div#temp').remove();
-
-
 	// must have a lest 2 chars
 	var tocIdsRegex = /^[ \t]*\[\w[\w_-]{1,}?\]|[ \t]*\[\w[\w_-]{1,}?\][ \t]*$/gm
 	var tocIds      = faq.match(tocIdsRegex)
@@ -17,9 +16,6 @@ function prettyifyGamefaqs () {
 		console.log("No toc found");
 		return;
 	}
-	
-	// console.log(tocIds);
-	// return;
 	
 	tocIds = tocIds.map(function(ele){
 		return ele.trim();
@@ -45,6 +41,8 @@ function prettyifyGamefaqs () {
 		return faq.indexOf(ele) == faq.lastIndexOf(ele);
 	});
 
+	console.log(tocIdsUniq);
+	console.log("length: " + tocIdsUniq.length);
 
 	console.log("\n\n\n")
 	section_indexes = tocIdsUniq.slice(1).map(function(ele){
@@ -74,10 +72,12 @@ function prettyifyGamefaqs () {
 		
 		var heading = document.createElement('h1');
 		heading.appendChild(document.createTextNode( getSectionName(ele,tocIdsUniq[index]) ));
-		
+				
 		$('div#content').append(heading);
 		$('div#content').append(pre);
+
 	});
+	
 }
 
 function getSectionName(text,shortName){
