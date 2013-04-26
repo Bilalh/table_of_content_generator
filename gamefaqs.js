@@ -10,17 +10,13 @@ function prettyifyGamefaqs () {
 
 
 	// must have a lest 2 chars
-	var tocIdsRegex = /\[\w[\w_-]{1,}?\][ \t]*\n/g
+	var tocIdsRegex = /\[\w[\w_-]{1,}?\]/g
 	var tocIds      = faq.match(tocIdsRegex)
 	
 	 if (tocIds.length <= 0){
 		console.log("No toc found");
 		return;
 	}
-	
-	tocIds = tocIds.map(function(ele){
-		return ele.trim();
-	});
 	
 	if (tocIds[0] == tocIds[1]){
 		console.log("Removed " + tocIds.splice(0,2) );
