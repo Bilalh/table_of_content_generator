@@ -2,49 +2,71 @@ function parseGameFaqs(o){
 	var text = o.query.results.pre; 
 	$(document).ready(function() {
 		prettyifyGamefaqs(text);
-		$('#toc').toc();
+		$('#toc').toc({});
 	});
 }
+
+function getFaq(url){
+	var url = encodeURIComponent("http://www.gamefaqs.com/3ds/643003-fire-emblem-awakening/faqs/64260");
+	var yql = "http://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20%20*%20%20from%20html%20where%20url%3D%22" + url +  "%22%20and%20xpath%3D'%2F%2Fpre'";
+	$.getJSON(yql,
+		function(data) {
+			parseGameFaqs(data);
+		}
+	);
+}
+
 
 function prettyifyGamefaqs (faq) {
 	$('div#temp').remove();
 	// must have a lest 2 chars
-	var tocIdsRegex = /^[ \t]*\[\w[\w_-]{1,}?\]|[ \t]*\[\w[\w_-]{1,}?\][ \t]*$/gm
+	var tocIdsRegex = /^[ \t]*\[\w[\w_.-]{1,}?\]|[ \t]*\[\w[\w_.-]{1,}?\][\t |]*$/gm
 	var tocIds      = faq.match(tocIdsRegex)
 	
-	 if (tocIds.length <= 0){
+	if (tocIds.length <= 0){
 		console.log("No toc found");
 		return;
-	}
-	
+	}	
 	tocIds = tocIds.map(function(ele){
-		return ele.trim();
+		return ele.replace('|','').trim();
 	});
 	
+	// console.log(tocIds);
+	// console.log("length: " + tocIds.length);
 	
 	if (tocIds[0] == tocIds[1]){
-		console.log("Removed " + tocIds.splice(0,2) );
+		tocIds.splice(0,2)
+		// console.log("Removed " + tocIds.splice(0,2) );
 	}
 	
 	tocIdsUniq = getElementsThatOccur(2,tocIds);
+	// console.log(tocIdsUniq);
+	// console.log("length: " + tocIdsUniq.length);
 	
-	console.log(tocIdsUniq);
-	console.log("length: " + tocIdsUniq.length);
+	if (tocIdsUniq.length <= 0){
+		console.log("No toc left");
+		$('div#content').append('<pre>'  + faq + '</pre>');
+		return;
+	}
+	
+	// console.log(tocIdsUniq);
+	// console.log("length: " + tocIdsUniq.length);
 		
 	// at the end of the line of the first section of the faq
 	var start_of_faq = faq.lastIndexOf(tocIdsUniq[0] );
 
 	var newStart = getNewStartingPoint(faq,start_of_faq);
-	faq = faq.slice(newStart)
-
+	topStuff = faq.slice(0,newStart);
+	faq = faq.slice(newStart);
+	
+	
 	tocIdsUniq = tocIdsUniq.filter(function(ele){
 		return faq.indexOf(ele) == faq.lastIndexOf(ele);
 	});
 
-	console.log(tocIdsUniq);
-	console.log("length: " + tocIdsUniq.length);
-
-	console.log("\n\n\n")
+	// console.log(tocIdsUniq);
+	// console.log("length: " + tocIdsUniq.length);
+	
 	section_indexes = tocIdsUniq.slice(1).map(function(ele){
 		var start_of_section = faq.indexOf(ele);
 		var new_start = getNewStartingPoint(faq,start_of_section)
@@ -55,8 +77,7 @@ function prettyifyGamefaqs (faq) {
 	section_indexes.unshift(0);
 	section_indexes.push(faq.length)
 	
-	console.log("\n\n");
-	console.log(section_indexes);
+	// console.log(section_indexes);
 
 	//Sections containing the data
 	var sections = new Array(section_indexes.length-1)
@@ -64,6 +85,13 @@ function prettyifyGamefaqs (faq) {
 		sections[i] = faq.slice(section_indexes[i],section_indexes[i+1])
 	};
 	
+	
+	tocIdsUniq.forEach(function(ele,index){
+		var url = '</pre><a class="noSpacing right" href="#toc' + index  +'">' +  ele +  '</a><pre class="">'
+		topStuff = topStuff.replace(ele,url)
+	});
+	
+	$('div#content').append('<pre>'  + topStuff + '</pre>');
 	
 	
 	sections.forEach(function(ele,index){
@@ -85,16 +113,19 @@ function getSectionName(text,shortName){
 	titlePart = titlePart.trim();
 	
 	var index = 0;
-	while (text[index] == '=' || text[index] == '*' || text[index] == '#' || text[index] == '-' ){
+	while (text[index] == '=' || text[index] == '*' || 
+	       text[index] == '#' || text[index] == '-' || text[index] == '_' ){
 		index++;
 	}
 	titleRes = titlePart.slice(index)
 	
 	// console.log(shortName)
 	// console.log(titleRes);
-	if (titleRes.length < 3 ){
+	if (titleRes.length < 3 || !titleRes.match(/[a-z]/gi) ){
 		return shortName;
 	}
+	
+	titleRes= titleRes.replace(/[_().|]+/g,"")
 	
 	if (titleRes.toUpperCase() == titleRes){
 		return(toTitleCase(titleRes));
@@ -121,7 +152,7 @@ function getNewStartingPoint(faq,start){
 	
 	// Go before decoration e.g  ===  above the line
 	var c = faq[start];
-	if (c == '=' || c == '*' || c == '#' || c == '-' ){
+	if (c == '=' || c == '*' || c == '#' || c == '-' || c == '_' ){
 		var index = start;
 		var d = c;
 		while ( (d = faq[index]) != '\n'){
@@ -168,3 +199,4 @@ function getDistinctArray(arr) {
         return !isDup;
     });
 }
+

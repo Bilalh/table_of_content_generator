@@ -5,14 +5,19 @@
     position: fixed;
     background: #333;
     box-shadow: inset -5px 0 5px 0px #000;
-    width: 250px;
+    width: 240px;
     padding-top: 20px;
     color: #fff;
 	overflow:scroll;
+	-webkit-text-size-adjust:none;
+}
+
+pre{
+font-size:115%
 }
 
 div#temp, div#content, div#temp *, div#content * {
-	padding-left: 130px;
+	padding-left: 122px;
 }
 
 #toc ul {
