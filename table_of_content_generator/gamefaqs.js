@@ -1,5 +1,4 @@
 function parseGameFaqs(o){
-	console.log(o)
 	var text = o.query.results.pre; 
 	$(document).ready(function() {
 		prettyifyGamefaqs(text);
@@ -13,7 +12,6 @@ function getFaq(url){
  + url + 
  "%22%20and%20xpath%3D'%2F%2Fpre'"
 	
-	console.log(yql);
 	$.getJSON(yql,
 		function(data) {
 			parseGameFaqs(data);
@@ -23,15 +21,19 @@ function getFaq(url){
 
 
 function prettyifyGamefaqs (faq) {
-	console.log("testing")
 	$('div#temp').remove();
-	// must have a lest 2 chars
-	var tocIdsRegex = /^[ \t]*\[\w[\w_.-]{1,}?\]|[ \t]*\[\w[\w_.-]{1,}?\][\t |]*$/gm
+	// must have a lest 3 chars of the form  
+	var tocIdsRegex = /^[ \t]*\[\w[\w&_.-]{2,}?\]|[ \t]*\[\w[\w&_.-]{1,}?\][\t |]*$/gm
 	var tocIds      = faq.match(tocIdsRegex)
 	
-	if (tocIds.length <= 0){
+	if (! tocIds || tocIds.length <= 0){
 		console.log("No toc found");
-		return;
+		tocIdsRegex = /^[ \t]*\*\*\w[\w&_.-]{2,}?\*\*|[ \t]*\*\*\w[\w&_.-]{1,}?\*\*[\t |]*$/gm
+		tocIds      = faq.match(tocIdsRegex)
+		if (! tocIds || tocIds.length <= 0){
+			console.log("Still No toc found");
+			return;
+		}
 	}	
 	tocIds = tocIds.map(function(ele){
 		return ele.replace('|','').trim();
