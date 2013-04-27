@@ -1,14 +1,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-		<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-				<title>Untitled Document</title>
-		</head>
+<html>
+<head>
+<title> testing </title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="gamefaqs.js"></script>
+<script src="jquery.toc.min.js"></script>
+
+<script>
+// var url ="http://www.gamefaqs.com/3ds/643003-fire-emblem-awakening/faqs/64260";
+
+var url = getURLParameter('url');
+getFaq(url);
+</script>
+
+<link rel="stylesheet" type="text/css" href="site.css">
+<link rel="stylesheet" type="text/css" href="toc.css">
+
+</head>
+<body>
+	<div id='toc'></div>
+	
+	<div id='content'>
 		
-		<body>
-			<form name="input" action="main.html" method="get"> 
-				Url: <input type="text" name="url">
-			<input type="submit" value="Submit">
-			</form>
-		</body>
+	</div>
+	
+</body>
 </html>
