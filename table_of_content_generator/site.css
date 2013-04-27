@@ -1,0 +1,21 @@
+h1 {
+font-size: 24px;
+}
+
+div#content h1{
+	visibility:hidden;
+	display:none;
+}
+
+.noSpacing{
+	margin: 0;
+	padding: 0;
+}
+
+.left{
+	float: left;
+}
+
+.right{
+	float: right;
+}
