@@ -1,4 +1,5 @@
 function parseGameFaqs(o){
+	console.log(o)
 	var text = o.query.results.pre; 
 	$(document).ready(function() {
 		prettyifyGamefaqs(text);
@@ -7,8 +8,12 @@ function parseGameFaqs(o){
 }
 
 function getFaq(url){
-	var url = encodeURIComponent("http://www.gamefaqs.com/3ds/643003-fire-emblem-awakening/faqs/64260");
-	var yql = "http://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20%20*%20%20from%20html%20where%20url%3D%22" + url +  "%22%20and%20xpath%3D'%2F%2Fpre'";
+	// var url = encodeURIComponent(url);
+	var yql = "http://query.yahooapis.com/v1/public/yql?format=json&q=select%20%20*%20%20from%20html%20where%20url%3D%22"
+ + url + 
+ "%22%20and%20xpath%3D'%2F%2Fpre'"
+	
+	console.log(yql);
 	$.getJSON(yql,
 		function(data) {
 			parseGameFaqs(data);
@@ -18,6 +23,7 @@ function getFaq(url){
 
 
 function prettyifyGamefaqs (faq) {
+	console.log("testing")
 	$('div#temp').remove();
 	// must have a lest 2 chars
 	var tocIdsRegex = /^[ \t]*\[\w[\w_.-]{1,}?\]|[ \t]*\[\w[\w_.-]{1,}?\][\t |]*$/gm
